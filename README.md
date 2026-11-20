@@ -189,10 +189,10 @@ All core options can also be overridden via `GOTMOJIFY_*` environment variables 
 | 📦️ | `:build:` | **build:** changes related to build processes |
 | 👷 | `:ci:` | **ci:** updates to the continuous integration system |
 | 🚀 | `:release:` | code deployment or publishing to external repositories |
-| 🔒️ | `:security:` | Fixing security issues. |
+| 🔒️ | `:security:` | Fix security or privacy issues. |
 | 🌐 | `:i18n:` | Internationalization and localization. |
-| 💥 | `:breaking:` | Introducing breaking changes. |
-| ⚙️ | `:config:` | Changing configuration files. |
+| 💥 | `:breaking:` | Introduce breaking changes. |
+| ⚙️ | `:config:` | Add or update configuration files. |
 | ➕ | `:add:` | add something |
 | ➖ | `:remove:` | remove something |
 

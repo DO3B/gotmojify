@@ -93,6 +93,48 @@ func TestConverter_Devmojify(t *testing.T) {
 	})
 }
 
+func TestConverter_UpdatedGitmojis(t *testing.T) {
+	t.Parallel()
+
+	must := require.New(t)
+
+	cfg, err := config.New(&config.Options{
+		Devmoji: []config.DevmojiDef{
+			{Code: "dx", Gitmoji: "technologist"},
+			{Code: "compat", Gitmoji: "t-rex"},
+			{Code: "patch", Gitmoji: "adhesive_bandage"},
+		},
+	})
+	must.NoError(err)
+
+	conv := devmoji.New(cfg)
+
+	cases := []struct {
+		name      string
+		unicode   string
+		shortcode string
+		devmoji   string
+	}{
+		{name: "technologist", unicode: "🧑‍💻", shortcode: ":technologist:", devmoji: ":dx:"},
+		{name: "t-rex", unicode: "🦖", shortcode: ":t-rex:", devmoji: ":compat:"},
+		{name: "adhesive bandage", unicode: "🩹", shortcode: ":adhesive_bandage:", devmoji: ":patch:"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			is := assert.New(t)
+			is.Equal(tc.unicode, conv.Emojify(tc.devmoji))
+			is.Equal(tc.unicode, conv.Emojify(tc.shortcode))
+			is.Equal(tc.shortcode, conv.Demojify(tc.unicode))
+			is.Equal(tc.shortcode, conv.Demojify(tc.devmoji))
+			is.Equal(tc.devmoji, conv.Devmojify(tc.unicode))
+			is.Equal(tc.devmoji, conv.Devmojify(tc.shortcode))
+		})
+	}
+}
+
 func TestConverter_ResolveCycleProtection(t *testing.T) {
 	t.Parallel()
 

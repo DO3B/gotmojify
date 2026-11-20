@@ -120,7 +120,7 @@ func TestGitHubAndGitmojiPacks(t *testing.T) {
 		gh := emoji.GitHub()
 
 		is.Greater(gh.Len(), 1400)
-		is.Greater(gm.Len(), 60)
+		is.GreaterOrEqual(gm.Len(), 75)
 
 		for _, item := range gm.All() {
 			shortcode := emoji.Wrap(item.Code)
@@ -158,5 +158,46 @@ func TestGitHubAndGitmojiPacks(t *testing.T) {
 		art, ok := emoji.Gitmoji().Get("art")
 		is.True(ok)
 		is.NotEmpty(art.Description)
+	})
+
+	t.Run("all newly synced official gitmojis exist and resolve", func(t *testing.T) {
+		t.Parallel()
+
+		is := assert.New(t)
+		must := require.New(t)
+
+		gm := emoji.Gitmoji()
+		gh := emoji.GitHub()
+
+		addedCodes := []string{
+			"memo",
+			"closed_lock_with_key",
+			"hammer",
+			"passport_control",
+			"adhesive_bandage",
+			"monocle_face",
+			"coffin",
+			"test_tube",
+			"necktie",
+			"stethoscope",
+			"bricks",
+			"technologist",
+			"money_with_wings",
+			"thread",
+			"safety_vest",
+			"airplane",
+			"t-rex",
+		}
+
+		for _, code := range addedCodes {
+			def, ok := gm.Get(code)
+			must.True(ok, "expected official gitmoji %s in gitmoji pack", code)
+			is.NotEmpty(def.Emoji)
+			is.NotEmpty(def.Description)
+
+			ghDef, ok := gh.Get(code)
+			must.True(ok, "expected official gitmoji %s in github pack", code)
+			is.Equal(def.Emoji, ghDef.Emoji)
+		}
 	})
 }

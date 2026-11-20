@@ -37,7 +37,7 @@ func TestNew(t *testing.T) {
 		sec, ok := cfg.Pack.Get("security")
 		must.True(ok)
 		is.Equal("lock", sec.Emoji)
-		is.Equal("Fixing security issues.", sec.Description)
+		is.Equal("Fix security or privacy issues.", sec.Description)
 	})
 
 	t.Run("overrides existing code preserving description", func(t *testing.T) {
@@ -199,7 +199,7 @@ devmoji:
 		css, ok := cfg.Pack.Get("css")
 		must.True(ok)
 		is.Equal("art", css.Emoji)
-		is.Equal("Improving structure / format of the code.", css.Description)
+		is.Equal("Improve structure / format of the code.", css.Description)
 	})
 
 	t.Run("falls back to defaults when no config exists", func(t *testing.T) {
