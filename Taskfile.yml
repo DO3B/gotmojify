@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: "3"
+
+vars:
+  BINARY_NAME: gotmojify
+  VERSION:
+    sh: git describe --tags --always --dirty 2>/dev/null || echo dev
+  COMMIT:
+    sh: git rev-parse --short HEAD 2>/dev/null || echo unknown
+  DATE: '{{now.UTC.Format "2006-01-02T15:04:05Z"}}'
+  LDFLAGS: -s -w -X main.version={{.VERSION}} -X main.commit={{.COMMIT}} -X main.date={{.DATE}}
+
+tasks:
+  default:
+    desc: List available tasks
+    silent: true
+    cmds:
+      - task --list
+
+  build:
+    desc: Build the application binary
+    cmds:
+      - go build -v -ldflags "{{.LDFLAGS}}" -o bin/{{.BINARY_NAME}}{{exeExt}} ./cmd/gotmojify
+
+  clean:
+    desc: Clean build and coverage artifacts
+    cmds:
+      - rm -rf bin dist coverage.out coverage.html
+
+  test:
+    desc: Run unit tests with shuffled order and coverage
+    cmds:
+      - go test -v -shuffle=on -count=1 -coverprofile=coverage.out ./...
+
+  test:race:
+    desc: Run unit tests with race detector enabled
+    cmds:
+      - go test -v -race -shuffle=on -count=1 -coverprofile=coverage.out ./...
+
+  test:coverage:
+    desc: Display per-function coverage summary
+    deps: [test]
+    cmds:
+      - go tool cover -func=coverage.out
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - golangci-lint run ./...
+
+  lint:fix:
+    desc: Run golangci-lint with auto-fix
+    cmds:
+      - golangci-lint run --fix ./...
+
+  fmt:
+    desc: Format code with golangci-lint and run go vet
+    cmds:
+      - golangci-lint fmt ./...
+      - go vet ./...
+
+  audit:
+    desc: Audit dependencies with govulncheck
+    cmds:
+      - govulncheck ./...
+
+  check:
+    desc: Run vet, lint, test, and security audit
+    cmds:
+      - task: vet
+      - task: lint
+      - task: test
+      - task: audit
+
+  deps:install:
+    desc: Download and tidy Go module dependencies
+    cmds:
+      - go mod download
+      - go mod tidy
+
+  deps:update:
+    desc: Update patch versions of dependencies
+    cmds:
+      - go get -u=patch ./...
+      - go mod tidy
+
+  hooks:install:
+    desc: Install lefthook git hooks
+    cmds:
+      - lefthook install
+
+  hooks:validate:
+    desc: Validate lefthook configuration
+    cmds:
+      - lefthook validate
+
+  release:check:
+    desc: Validate GoReleaser configuration
+    cmds:
+      - goreleaser check
+
+  all:
+    desc: Clean, lint, test, and build the application
+    cmds:
+      - task: clean
+      - task: lint
+      - task: test
+      - task: build

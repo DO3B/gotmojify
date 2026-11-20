@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://lefthook.dev/schema.json
+pre-commit:
+  parallel: true
+  jobs:
+    - name: format
+      glob: "*.go"
+      run: golangci-lint fmt {staged_files}
+      stage_fixed: true
+
+    - name: vet
+      glob: "*.go"
+      run: go vet ./...
+
+    - name: lint
+      glob: "*.go"
+      run: golangci-lint run --new-from-rev=HEAD ./...
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: test
+      run: go test -shuffle=on -count=1 ./...
+
+    - name: mod-tidy
+      run: go mod tidy && git diff --exit-code go.mod go.sum
+
+commit-msg:
+  jobs:
+    - name: gotmojify
+      run: go run ./cmd/gotmojify --edit --lint
