@@ -217,7 +217,7 @@ task check
 ## Automated Releases & CI
 
 - **CI**: GitHub Actions workflows run unit tests across Go `1.26`, `1.27`, and `stable` with `-race`, `golangci-lint`, `govulncheck`, `gosec`, and CodeQL.
-- **Releases**: Pushing a semver tag (`git tag v1.0.0 && git push origin v1.0.0`) runs tests and triggers GoReleaser via `.github/workflows/release.yml` to publish binaries and checksums.
+- **Releases**: [Release Please](https://github.com/googleapis/release-please) (`.github/workflows/release-please.yml`) runs automatically once `Tests`, `Lint`, and `Security` all succeed on `main`, managing release PRs and changelogs via `release-please-config.json` and `.release-please-manifest.json`. Merging a Release Please PR creates the version tag and GitHub Release and invokes `.github/workflows/release.yml` (GoReleaser) to publish binaries and checksums; pushing a manual `v*` tag (`git tag v1.0.0 && git push origin v1.0.0`) also continues to work.
 - **Dependency Updates**: Configured via `.github/dependabot.yml` for Go modules and GitHub Actions.
 
 ## License
